@@ -153,20 +153,12 @@ jobs:
     needs: Compilation
     steps:
       - uses: actions/checkout@v4
+
       - name: Build
-        run: |
-          mkdir -p build && cd build
-          cmake .. && make
-      - name: Run test car
-        run: |
-          cd build
-          echo "== Test car 5 ==" > report_car.txt
-          set +e
-          ./src/calculator car 5 | tee -a report_car.txt
-          status=${PIPESTATUS[0]}
-          echo "Exit code: $status" >> report_car.txt
-          grep -q "Erreur" report_car.txt && exit 1
-          exit $status
+        run: cmake -S . -B build && cmake --build build --parallel 4
+
+      - name: Test carré
+        run: ctest --test-dir build -R '^t5$' --output-on-failure
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
