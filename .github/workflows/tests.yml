@@ -48,6 +48,43 @@ jobs:
           path: build/report.txt
           retention-days: 14
 
+      - name: Run test "sub" and capture report
+        if: always()
+        run: |
+          cd build
+          echo "== Test sub 10 5 ==" > report_sub.txt
+          set +e
+          ./src/calculator sub 10 5 | tee -a report_sub.txt
+          status=${PIPESTATUS[0]}
+          echo "Exit code: $status" >> report_sub.txt
+          exit $status
+
+      - name: Upload report "sub"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-sub-report
+          path: build/report_sub.txt
+          retention-days: 14
+      - name: Run test "car" and capture report
+        if: always()
+        run: |
+          cd build
+          echo "== Test car 5 ==" > report_car.txt
+          set +e
+          ./src/calculator car 5 | tee -a report_car.txt
+          status=${PIPESTATUS[0]}
+          echo "Exit code: $status" >> report_car.txt
+          exit $status
+
+      - name: Upload report "car"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-car-report
+          path: build/report_car.txt
+          retention-days: 14
+
       - name: Job summary
         if: always()
         run: |
