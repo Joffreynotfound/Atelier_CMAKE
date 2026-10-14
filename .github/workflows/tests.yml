@@ -33,49 +33,35 @@ jobs:
       - name: Run test "add" and capture report
         run: |
           cd build
-          echo "== Test add 10 5 ==" > report.txt
+          echo "== Test add 2 3 ==" > report_add.txt
           set +e
-          ./src/calculator add 10 5 | tee -a report.txt
+          ./src/calculator add 2 3 | tee -a report_add.txt
           status=${PIPESTATUS[0]}
-          echo "Exit code: $status" >> report.txt
+          echo "Exit code: $status" >> report_add.txt
           exit $status
-
-      - name: Upload report as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-add-report
-          path: build/report.txt
-          retention-days: 14
 
       - name: Run test "sub" and capture report
         if: always()
         run: |
           cd build
-          echo "== Test sub 10 5 ==" > report_sub.txt
+          echo "== Test sub 3 -2 ==" > report_sub.txt
           set +e
-          ./src/calculator sub 10 5 | tee -a report_sub.txt
+          ./src/calculator sub 3 -2 | tee -a report_sub.txt
           status=${PIPESTATUS[0]}
           echo "Exit code: $status" >> report_sub.txt
           exit $status
 
-      - name: Upload report "sub"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-sub-report
-          path: build/report_sub.txt
-          retention-days: 14
-
-      - name: Job summary
+      - name: Run test "mul" and capture report
         if: always()
         run: |
-          echo "## Résultats des tests" >> $GITHUB_STEP_SUMMARY
-          for f in build/report_*.txt; do
-            name=$(basename "$f" .txt)
-            name=${name#report_}
-            echo "### Test *$name*" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat "$f" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          done
+          cd build
+          echo "== Test mul 5 5 ==" > report_mul.txt
+          set +e
+          ./src/calculator mul 5 5 | tee -a report_mul.txt
+          status=${PIPESTATUS[0]}
+          echo "Exit code: $status" >> report_mul.txt
+          exit $status
+
+      - name: Run test "div" and capture report
+        if: always()
+        run:
