@@ -16,21 +16,16 @@ jobs:
           make
           make test
 
-  Tests:
+  Test_Add:
     runs-on: ubuntu-latest
     needs: Compilation
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Build
         run: |
-          mkdir -p build
-          cd build
-          cmake ..
-          make
-
-      - name: Run test "add" and capture report
+          mkdir -p build && cd build
+          cmake .. && make
+      - name: Run test add
         run: |
           cd build
           echo "== Test add 2 3 ==" > report_add.txt
@@ -39,9 +34,31 @@ jobs:
           status=${PIPESTATUS[0]}
           echo "Exit code: $status" >> report_add.txt
           exit $status
-
-      - name: Run test "sub" and capture report
+      - name: Upload report
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-add-report
+          path: build/report_add.txt
+          retention-days: 14
+      - name: Job summary
+        if: always()
+        run: |
+          echo "### Test *add*" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/report_add.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  Test_Sub:
+    runs-on: ubuntu-latest
+    needs: Compilation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          mkdir -p build && cd build
+          cmake .. && make
+      - name: Run test sub
         run: |
           cd build
           echo "== Test sub 3 -2 ==" > report_sub.txt
@@ -50,9 +67,31 @@ jobs:
           status=${PIPESTATUS[0]}
           echo "Exit code: $status" >> report_sub.txt
           exit $status
-
-      - name: Run test "mul" and capture report
+      - name: Upload report
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-sub-report
+          path: build/report_sub.txt
+          retention-days: 14
+      - name: Job summary
+        if: always()
+        run: |
+          echo "### Test *sub*" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/report_sub.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  Test_Mul:
+    runs-on: ubuntu-latest
+    needs: Compilation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          mkdir -p build && cd build
+          cmake .. && make
+      - name: Run test mul
         run: |
           cd build
           echo "== Test mul 5 5 ==" > report_mul.txt
@@ -61,7 +100,84 @@ jobs:
           status=${PIPESTATUS[0]}
           echo "Exit code: $status" >> report_mul.txt
           exit $status
-
-      - name: Run test "div" and capture report
+      - name: Upload report
         if: always()
-        run:
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-mul-report
+          path: build/report_mul.txt
+          retention-days: 14
+      - name: Job summary
+        if: always()
+        run: |
+          echo "### Test *mul*" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/report_mul.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  Test_Div:
+    runs-on: ubuntu-latest
+    needs: Compilation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          mkdir -p build && cd build
+          cmake .. && make
+      - name: Run test div
+        run: |
+          cd build
+          echo "== Test div 1 5 ==" > report_div.txt
+          set +e
+          ./src/calculator div 1 5 | tee -a report_div.txt
+          status=${PIPESTATUS[0]}
+          echo "Exit code: $status" >> report_div.txt
+          exit $status
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-div-report
+          path: build/report_div.txt
+          retention-days: 14
+      - name: Job summary
+        if: always()
+        run: |
+          echo "### Test *div*" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/report_div.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  Test_Car:
+    runs-on: ubuntu-latest
+    needs: Compilation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          mkdir -p build && cd build
+          cmake .. && make
+      - name: Run test car
+        run: |
+          cd build
+          echo "== Test car 5 ==" > report_car.txt
+          set +e
+          ./src/calculator car 5 | tee -a report_car.txt
+          status=${PIPESTATUS[0]}
+          echo "Exit code: $status" >> report_car.txt
+          grep -q "Erreur" report_car.txt && exit 1
+          exit $status
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-car-report
+          path: build/report_car.txt
+          retention-days: 14
+      - name: Job summary
+        if: always()
+        run: |
+          echo "### Test *car*" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/report_car.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
