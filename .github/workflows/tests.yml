@@ -66,29 +66,16 @@ jobs:
           name: test-sub-report
           path: build/report_sub.txt
           retention-days: 14
-      - name: Run test "car" and capture report
-        if: always()
-        run: |
-          cd build
-          echo "== Test car 5 ==" > report_car.txt
-          set +e
-          ./src/calculator car 5 | tee -a report_car.txt
-          status=${PIPESTATUS[0]}
-          echo "Exit code: $status" >> report_car.txt
-          exit $status
-
-      - name: Upload report "car"
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-car-report
-          path: build/report_car.txt
-          retention-days: 14
 
       - name: Job summary
         if: always()
         run: |
-          echo "### Résultat du test *add*" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat build/report.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "## Résultats des tests" >> $GITHUB_STEP_SUMMARY
+          for f in build/report_*.txt; do
+            name=$(basename "$f" .txt)
+            name=${name#report_}
+            echo "### Test *$name*" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "$f" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          done
